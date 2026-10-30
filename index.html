@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>โหวตเกมแมพ ญานนเรศวร์พัฒนาพิทยาคม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#6ab7ff; --sky2:#bfe4ff; --grass:#5da03a; --grass-d:#3f7a26;
+  --dirt:#8a5a35; --dirt-d:#5e3b20; --stone:#9a9a9a; --stone-l:#d0d0d0; --stone-d:#4a4a4a;
+  --ink:#1b1b1b; --yes:#4cc23a; --no:#d6453d; --gold:#ffd23f;
+}
+*{box-sizing:border-box;margin:0}
+html,body{min-height:100%}
+body{
+  font-family:'Kanit',sans-serif;color:var(--ink);
+  background:linear-gradient(var(--sky) 0 55%,var(--sky2));
+  padding:24px 16px 0;min-height:100vh;position:relative;overflow-x:hidden;
+}
+/* พื้นหญ้า-ดิน แบบบล็อก */
+.ground{position:fixed;left:0;right:0;bottom:0;height:90px;z-index:0;
+  background:
+   linear-gradient(var(--grass) 0 22px,var(--grass-d) 22px 28px,transparent 28px),
+   repeating-linear-gradient(90deg,var(--dirt) 0 32px,var(--dirt-d) 32px 36px);
+  background-color:var(--dirt);}
+.cloud{position:fixed;background:#fff;height:28px;width:110px;box-shadow:28px -20px 0 #fff,56px 0 0 #fff;opacity:.9;z-index:0}
+.c1{top:60px;left:8%;animation:drift 60s linear infinite}
+.c2{top:140px;left:60%;transform:scale(.7);animation:drift 90s linear infinite reverse}
+@keyframes drift{50%{transform:translateX(80px)}}
+main{position:relative;z-index:1;max-width:620px;margin:0 auto 110px}
+
+h1{font-family:'Press Start 2P',monospace;font-size:clamp(18px,5vw,30px);line-height:1.5;text-align:center;
+  color:#fff;text-shadow:3px 3px 0 #333,-1px -1px 0 #333,1px -1px 0 #333,-1px 1px 0 #333;margin-bottom:6px}
+h1 span{color:var(--gold)}
+.school{text-align:center;font-weight:800;font-size:clamp(17px,4.6vw,24px);color:#fff;
+  text-shadow:2px 2px 0 #333;margin-bottom:18px}
+
+/* กรอบสไตล์ GUI ของ Minecraft */
+.panel{
+  background:var(--stone);padding:22px 20px;
+  border:4px solid;border-color:var(--stone-l) var(--stone-d) var(--stone-d) var(--stone-l);
+  outline:4px solid #222;box-shadow:8px 8px 0 rgba(0,0,0,.35);
+}
+.q{font-weight:800;font-size:clamp(20px,5vw,26px);text-align:center;margin-bottom:6px;color:#222}
+.sub{text-align:center;color:#333;margin-bottom:18px}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn{
+  font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(20px,5vw,26px);
+  padding:16px 10px;cursor:pointer;color:#fff;text-shadow:2px 2px 0 rgba(0,0,0,.5);
+  border:4px solid;border-color:rgba(255,255,255,.55) rgba(0,0,0,.45) rgba(0,0,0,.45) rgba(255,255,255,.55);
+  outline:3px solid #111;transition:transform .08s;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn:active{transform:translate(3px,3px)}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.yes{background:var(--yes)} .no{background:var(--no)}
+.btn.sel{box-shadow:0 0 0 4px var(--gold)}
+
+.more{display:none;margin-top:20px;background:#c6c6c6;padding:16px;
+  border:4px solid;border-color:var(--stone-d) var(--stone-l) var(--stone-l) var(--stone-d)}
+.more.show{display:block;animation:pop .25s steps(4)}
+@keyframes pop{from{transform:scale(.92);opacity:0}}
+.more label{font-weight:600;display:block;margin-bottom:4px}
+.more small{color:#444;display:block;margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{font-family:'Kanit';font-size:15px;padding:6px 10px;background:#8b8b8b;color:#fff;cursor:pointer;
+  border:3px solid;border-color:#bbb #444 #444 #bbb;text-shadow:1px 1px 0 #000;user-select:none}
+.chip.on{background:var(--grass);border-color:#9be07d #2a5a16 #2a5a16 #9be07d}
+textarea{width:100%;min-height:96px;resize:vertical;font-family:'Kanit';font-size:16px;padding:10px;
+  background:#1d1d1d;color:#e8ffe0;border:4px solid;border-color:#000 #777 #777 #000;margin-bottom:14px}
+textarea::placeholder{color:#7d8a78}
+.send{width:100%;background:var(--grass);font-size:clamp(18px,4.6vw,22px)}
+.msg{margin-top:14px;text-align:center;font-weight:600;min-height:24px}
+.msg.err{color:#a01010}
+
+.stats{margin-top:20px;display:none;font-family:'Press Start 2P',monospace;font-size:11px;line-height:2;text-align:center;color:#222}
+.stats b{color:#1a6b0e}
+
+.done{display:none;text-align:center;padding:10px 0}
+.done .big{font-family:'Press Start 2P',monospace;font-size:clamp(14px,4vw,20px);line-height:1.7;margin-bottom:10px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="cloud c1"></div><div class="cloud c2"></div><div class="ground"></div>
+
+<main>
+  <h1>MAP <span>QUEST</span></h1>
+  <div class="school">โรงเรียนญาณนเรศวร์พัฒนาพิทยาคม</div>
+
+  <section class="panel" id="vote">
+    <p class="q">อยากเล่นเกมแมพโรงเรียนเราไหม?</p>
+    <p class="sub">แมพโรงเรียนเวอร์ชันเกม เดินสำรวจตึกต่างๆ ได้เหมือนจริง</p>
+
+    <div class="row">
+      <button class="btn yes" id="btnYes">⛏ อยาก</button>
+      <button class="btn no" id="btnNo">✖ ไม่อยาก</button>
+    </div>
+
+    <div class="more" id="more">
+      <label for="wish">อยากได้อะไรในแมพบ้าง?</label>
+      <small>ไม่บังคับกรอก — จะข้ามก็ได้</small>
+      <div class="chips" id="chips">
+        <span class="chip">🏫 ตึกเรียน</span><span class="chip">⚽ สนามกีฬา</span>
+        <span class="chip">🍜 โรงอาหาร</span><span class="chip">🎭 หอประชุม</span>
+        <span class="chip">🏆 มินิเกม</span><span class="chip">🧑‍🤝‍🧑 เล่นกับเพื่อน</span>
+        <span class="chip">🎁 ไอเท็ม/ของสะสม</span>
+      </div>
+      <textarea id="wish" maxlength="300" placeholder="เช่น อยากได้ห้องลับ, ซ่อนแอบกับเพื่อน..."></textarea>
+      <button class="btn send" id="btnSend">🎮 ส่ง อยากเล่น</button>
+    </div>
+
+    <p class="msg" id="msg" role="status"></p>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="panel done" id="done">
+    <p class="big" id="doneText">ส่งแล้ว!</p>
+    <p id="doneSub">ขอบคุณที่ร่วมโหวต</p>
+  </section>
+</main>
+
+<script>
+// ▼ วาง URL ของ Google Apps Script (Web app) ตรงนี้
+const SCRIPT_URL = "";
+
+const $ = id => document.getElementById(id);
+let choice = null;
+
+function pick(c){
+  choice = c;
+  $('btnYes').classList.toggle('sel', c==='อยาก');
+  $('btnNo').classList.toggle('sel', c==='ไม่อยาก');
+  $('more').classList.toggle('show', c==='อยาก');
+  $('msg').textContent = '';
+  if(c==='ไม่อยาก') submit();
+}
+$('btnYes').onclick = () => pick('อยาก');
+$('btnNo').onclick  = () => pick('ไม่อยาก');
+document.querySelectorAll('.chip').forEach(ch => ch.onclick = () => ch.classList.toggle('on'));
+
+async function submit(){
+  const picked = [...document.querySelectorAll('.chip.on')].map(c=>c.textContent.trim());
+  const text = $('wish').value.trim();
+  const wish = choice==='อยาก' ? [picked.join(', '), text].filter(Boolean).join(' | ') : '';
+  const msg = $('msg');
+  if(!SCRIPT_URL){ msg.className='msg err'; msg.textContent='ยังไม่ได้ใส่ SCRIPT_URL ในโค้ด'; return; }
+  msg.className='msg'; msg.textContent='กำลังส่ง...';
+  $('btnSend').disabled = true;
+  try{
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({choice,wish,time:new Date().toISOString()})});
+    $('vote').style.display='none';
+    $('done').style.display='block';
+    $('doneText').textContent = choice==='อยาก' ? 'GG! ส่งแล้ว 🎉' : 'รับทราบแล้ว';
+    $('doneSub').textContent = choice==='อยาก' ? 'เจอกันในแมพเร็วๆ นี้' : 'ขอบคุณที่ร่วมโหวต';
+  }catch(e){
+    msg.className='msg err'; msg.textContent='ส่งไม่สำเร็จ ลองกดส่งอีกครั้ง';
+    $('btnSend').disabled=false;
+  }
+}
+$('btnSend').onclick = submit;
+
+// แสดงจำนวนโหวต (ถ้ามี SCRIPT_URL)
+if(SCRIPT_URL){
+  fetch(SCRIPT_URL).then(r=>r.json()).then(d=>{
+    const s=$('stats'); s.style.display='block';
+    s.innerHTML=`อยาก <b>${d.yes}</b> คน &nbsp;|&nbsp; ไม่อยาก <b>${d.no}</b> คน`;
+  }).catch(()=>{});
+}
+</script>
+</body>
+</html>
